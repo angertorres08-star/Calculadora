@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Contable Venezuela</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .decimal-custom {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen p-4 md:p-8 flex items-center justify-center">
+
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-blue-700 p-6 text-white">
+            <div class="flex items-center gap-3 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="16" height="20" x="4" y="2" rx="2" />
+                    <line x1="8" x2="16" y1="6" y2="6" />
+                    <line x1="16" x2="16" y1="14" y2="18" />
+                    <path d="M16 10h.01" />
+                    <path d="M12 10h.01" />
+                    <path d="M8 10h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M8 14h.01" />
+                    <path d="M12 18h.01" />
+                    <path d="M8 18h.01" />
+                </svg>
+                <h1 class="text-2xl font-bold tracking-tight">Cálculo Inverso (Venezuela)</h1>
+            </div>
+            <p class="text-blue-100 text-sm opacity-90">
+                Calcula los valores de factura a partir del dinero recibido en banco.
+            </p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Monto Neto Recibido -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" x2="21" y1="22" y2="22" />
+                            <line x1="6" x2="6" y1="18" y2="11" />
+                            <line x1="10" x2="10" y1="18" y2="11" />
+                            <line x1="14" x2="14" y1="18" y2="11" />
+                            <line x1="18" x2="18" y1="18" y2="11" />
+                            <polygon points="12 2 20 7 4 7 12 2" />
+                        </svg>
+                        Monto Recibido en Banco
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">Bs.</span>
+                        <input type="number" id="netoInput" placeholder="0,00" step="0.01"
+                            class="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-lg" />
+                    </div>
+                </div>
+
+                <!-- Retención IVA -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z" />
+                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+                            <path d="M12 17.5V6.5" />
+                        </svg>
+                        % Retención de IVA
+                    </label>
+                    <div class="flex p-1 bg-slate-100 rounded-lg border border-slate-200">
+                        <button data-type="ret" data-value="75" id="btn-75"
+                            class="flex-1 py-2 rounded-md text-sm font-medium transition-all text-slate-500 hover:text-slate-700">
+                            75%
+                        </button>
+                        <button data-type="ret" data-value="100" id="btn-100"
+                            class="flex-1 py-2 rounded-md text-sm font-medium transition-all bg-white text-blue-700 shadow-sm">
+                            100%
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-tight">
+                        Seleccione según su condición de contribuyente. Puede consultar en el
+                        <a href="http://contribuyentes.seniat.gob.ve/buscardatos/buscardatos.do" target="_blank"
+                            class="text-blue-600 underline hover:text-blue-800">portal del SENIAT</a>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botón y campo de Descuento -->
+            <div class="space-y-3">
+                <button id="toggleDescuento"
+                    class="flex items-center gap-2 text-blue-600 text-sm font-semibold hover:text-blue-800 transition-colors">
+                    <svg id="descIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" x2="12" y1="8" y2="16" />
+                        <line x1="8" x2="16" y1="12" y2="12" />
+                    </svg>
+                    <span>¿Agregar descuento acordado?</span>
+                </button>
+
+                <div id="descuentoContainer" class="hidden animate-in fade-in duration-300">
+                    <div class="space-y-2 max-w-xs">
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Monto a descontar
+                            (Bs.)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">Bs.</span>
+                            <input type="number" id="descuentoInput" placeholder="0,00" step="0.01"
+                                class="w-full pl-12 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor de Resultados -->
+            <div id="resultsContainer" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6" />
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                        <path d="M3 22v-6h6" />
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                    </svg>
+                    Desglose Reconstruido de Factura
+                </h2>
+
+                <div class="overflow-hidden rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-sm md:text-base">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                                <th class="px-4 py-3 font-semibold">Concepto</th>
+                                <th class="px-4 py-3 font-semibold text-right">Monto (Bs.)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr>
+                                <td class="px-4 py-3 text-slate-600 font-medium">Monto Base (Sub-total)</td>
+                                <td id="resBase" class="px-4 py-3 text-right font-bold text-slate-900 decimal-custom">
+                                    0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-slate-600">IVA (16%)</td>
+                                <td id="resIva" class="px-4 py-3 text-right text-slate-900 decimal-custom">0,00</td>
+                            </tr>
+                            <tr class="bg-blue-50/30">
+                                <td class="px-4 py-3 font-bold text-slate-800 italic">Total Factura (A)</td>
+                                <td id="resTotalFactura"
+                                    class="px-4 py-3 text-right font-bold text-slate-800 decimal-custom">0,00</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 text-red-600 italic">Retención ISLR (3% - 107,50) (B)</td>
+                                <td id="resRetIslr" class="px-4 py-3 text-right text-red-600 decimal-custom">-0,00</td>
+                            </tr>
+                            <tr>
+                                <td id="labelRetIva" class="px-4 py-3 text-red-600 italic">Retención IVA (C)</td>
+                                <td id="resRetIva" class="px-4 py-3 text-right text-red-600 decimal-custom">-0,00</td>
+                            </tr>
+                            <tr class="bg-slate-50 border-t-2 border-slate-200 font-bold">
+                                <td class="px-4 py-3 text-slate-800">Neto a Pagar según Factura</td>
+                                <td id="resNetoFactura" class="px-4 py-3 text-right text-slate-800 decimal-custom">0,00
+                                </td>
+                            </tr>
+                            <tr id="rowDescuento" class="hidden text-orange-600">
+                                <td class="px-4 py-3 italic">Menos: Descuento Acordado</td>
+                                <td id="resDescuento" class="px-4 py-3 text-right font-medium decimal-custom">-0,00</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-slate-800 text-white">
+                                <th class="px-4 py-4 font-bold rounded-bl-xl">Monto Final Recibido en Banco</th>
+                                <th id="resMontoPagar"
+                                    class="px-4 py-4 text-right font-black text-xl rounded-br-xl italic underline decoration-blue-400 decimal-custom">
+                                    0,00
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Estado Vacío -->
+            <div id="emptyState"
+                class="py-12 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-3 opacity-20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="16" height="20" x="4" y="2" rx="2" />
+                    <line x1="8" x2="16" y1="6" y2="6" />
+                    <line x1="16" x2="16" y1="14" y2="18" />
+                    <path d="M16 10h.01" />
+                    <path d="M12 10h.01" />
+                    <path d="M8 10h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M8 14h.01" />
+                    <path d="M12 18h.01" />
+                    <path d="M8 18h.01" />
+                </svg>
+                <p>Ingrese el monto recibido para reconstruir la factura</p>
+            </div>
+        </div>
+
+        <div
+            class="p-4 bg-slate-50 text-[10px] text-slate-400 text-center uppercase tracking-widest border-t border-slate-200">
+            Calculadora Fiscal · Venezuela <span id="year"></span>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const netoInput = document.getElementById('netoInput');
+        const descuentoInput = document.getElementById('descuentoInput');
+        const toggleDescuento = document.getElementById('toggleDescuento');
+        const descuentoContainer = document.getElementById('descuentoContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const rowDescuento = document.getElementById('rowDescuento');
+
+        let currentRetPercent = 100;
+        let showDescuento = false;
+
+        // Función de redondeo estricto a 2 decimales
+        const roundTo2 = (num) => {
+            return Math.round((num + Number.EPSILON) * 100) / 100;
+        };
+
+        // Formateo visual para Venezuela
+        const formatVE = (num) => {
+            return new Intl.NumberFormat('es-VE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }).format(num);
+        };
+
+        toggleDescuento.addEventListener('click', () => {
+            showDescuento = !showDescuento;
+            if (showDescuento) {
+                descuentoContainer.classList.remove('hidden');
+                toggleDescuento.querySelector('span').textContent = 'Quitar descuento';
+                toggleDescuento.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="8" x2="16" y1="12" y2="12"/>';
+            } else {
+                descuentoContainer.classList.add('hidden');
+                descuentoInput.value = '';
+                toggleDescuento.querySelector('span').textContent = '¿Agregar descuento acordado?';
+                toggleDescuento.querySelector('svg').innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/>';
+                rowDescuento.classList.add('hidden');
+            }
+            calcular();
+        });
+
+        function calcular() {
+            const bancoRecibido = parseFloat(netoInput.value);
+            const descAnticipo = parseFloat(descuentoInput.value) || 0;
+
+            if (isNaN(bancoRecibido) || bancoRecibido <= 0) {
+                resultsContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            resultsContainer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            const sustraendo = 107.50;
+            const tasaIva = 0.16;
+            const tasaIslr = 0.03;
+            const fraccionRetIva = currentRetPercent / 100;
+
+            // Reconstrucción lógica despejando Base (Redondeo aplicado al final de la reconstrucción)
+            const dividendo = bancoRecibido + descAnticipo - sustraendo;
+            const divisor = (1 + tasaIva - tasaIslr - (tasaIva * fraccionRetIva));
+
+            // 1. Calculamos y redondeamos la BASE de inmediato para que sea el valor contable oficial
+            const base = roundTo2(dividendo / divisor);
+
+            // 2. Calculamos los componentes con base en el monto redondeado
+            const iva = roundTo2(base * tasaIva);
+            const totalFactura = roundTo2(base + iva);
+
+            // 3. Calculamos retenciones (redondeando cada una)
+            const retIslr = roundTo2((base * tasaIslr) - sustraendo);
+            const retIva = roundTo2(iva * fraccionRetIva);
+
+            // 4. Calculamos Netos finales basados en valores ya redondeados
+            const netoFactura = roundTo2(totalFactura - retIslr - retIva);
+            const montoPagarFinal = roundTo2(netoFactura - descAnticipo);
+
+            // Actualizar Interfaz de Usuario
+            document.getElementById('resBase').textContent = formatVE(base);
+            document.getElementById('resIva').textContent = formatVE(iva);
+            document.getElementById('resTotalFactura').textContent = formatVE(totalFactura);
+            document.getElementById('resRetIslr').textContent = formatVE(retIslr);
+            document.getElementById('resRetIva').textContent = formatVE(retIva);
+            document.getElementById('labelRetIva').textContent = `Retención IVA (${currentRetPercent}%) (C)`;
+            document.getElementById('resNetoFactura').textContent = formatVE(netoFactura);
+
+            if (descAnticipo > 0) {
+                rowDescuento.classList.remove('hidden');
+                document.getElementById('resDescuento').textContent = `-${formatVE(descAnticipo)}`;
+            } else {
+                rowDescuento.classList.add('hidden');
+            }
+
+            document.getElementById('resMontoPagar').textContent = formatVE(montoPagarFinal);
+        }
+
+        netoInput.addEventListener('input', calcular);
+        descuentoInput.addEventListener('input', calcular);
+
+        document.querySelectorAll('[data-type="ret"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-type="ret"]').forEach(b => {
+                    b.classList.remove('bg-white', 'text-blue-700', 'shadow-sm');
+                    b.classList.add('text-slate-500', 'hover:text-slate-700');
+                });
+                btn.classList.add('bg-white', 'text-blue-700', 'shadow-sm');
+                btn.classList.remove('text-slate-500', 'hover:text-slate-700');
+
+                currentRetPercent = parseInt(btn.dataset.value);
+                calcular();
+            });
+        });
+    </script>
+</body>
+
+</html>
